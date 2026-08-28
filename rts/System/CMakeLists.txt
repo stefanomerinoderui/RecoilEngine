@@ -51,6 +51,7 @@ make_global_var(sources_engine_System_common
 		"${CMAKE_CURRENT_SOURCE_DIR}/Platform/SDL1_keysym.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Platform/Watchdog.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Platform/WindowManagerHelper.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/QuarkAnticheat/quark_sdk.c"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Rectangle.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/SafeVector.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/SafeCStrings.c"

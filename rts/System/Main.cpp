@@ -15,6 +15,10 @@
 #include "System/Platform/Misc.h"
 #include "System/Log/ILog.h"
 
+#ifdef __linux__
+	#include "System/QuarkAnticheat/quark_sdk.h"
+#endif
+
 #include <nowide/args.hpp>
 
 #include <clocale>
@@ -44,6 +48,14 @@ int Run(int argc, char* argv[])
 
 	Threading::DetectCores();
 	Threading::SetMainThread();
+
+#ifdef __linux__
+	// Quark Anticheat: register this process with the local Quark Daemon (if running)
+	// so the Ring-0 kernel module can deny external ptrace/proc-mem access to it.
+	// Fails open (logs and continues unprotected) when the daemon isn't present.
+	if (quark_sdk_init() != 0)
+		LOG("[QuarkAnticheat] daemon not detected, running unprotected");
+#endif
 
 	LOG("%s: thread affinity %x", __func__, Threading::GetAffinity());
 	SpringApp app(argc, argv);
