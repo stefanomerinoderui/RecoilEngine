@@ -30,6 +30,7 @@ CR_REG_METADATA(CGameSetup, (
 	CR_IGNORED(useLuaGaia),
 	CR_IGNORED(luaDevMode),
 	CR_IGNORED(noHelperAIs),
+	CR_IGNORED(requireQuarkAnticheat),
 
 	CR_IGNORED(ghostedBuildings),
 	CR_IGNORED(disableMapDamage),
@@ -183,6 +184,7 @@ void CGameSetup::ResetState()
 	useLuaGaia = true;
 	luaDevMode = false;
 	noHelperAIs = false;
+	requireQuarkAnticheat = false;
 
 	ghostedBuildings = true;
 	disableMapDamage = false;
@@ -629,6 +631,7 @@ bool CGameSetup::Init(const std::string& buf)
 	file.GetDef(useLuaGaia,          "1", "GAME\\ModOptions\\LuaGaia");
 	file.GetDef(luaDevMode,          "0", "GAME\\ModOptions\\LuaDevMode");
 	file.GetDef(noHelperAIs,         "0", "GAME\\ModOptions\\NoHelperAIs");
+	file.GetDef(requireQuarkAnticheat, "0", "GAME\\ModOptions\\RequireQuarkAnticheat");
 	file.GetDef(maxUnitsPerTeam, "32000", "GAME\\ModOptions\\MaxUnits");
 	file.GetDef(disableMapDamage,    "0", "GAME\\ModOptions\\DisableMapDamage");
 	file.GetDef(ghostedBuildings,    "1", "GAME\\ModOptions\\GhostedBuildings");

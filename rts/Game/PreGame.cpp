@@ -28,6 +28,10 @@
 
 #include "aGui/Gui.h"
 
+#ifdef __linux__
+	#include "System/QuarkAnticheat/quark_sdk.h"
+#endif
+
 #include "Rendering/Fonts/glFont.h"
 #include "Sim/Misc/GlobalSynced.h"
 #include "Sim/Misc/GlobalConstants.h"
@@ -336,7 +340,11 @@ void CPreGame::StartServer(const std::string& setupscript)
 	startGameData->SetSetupText(startGameSetup->setupText);
 	gameServer = new CGameServer(clientSetup, startGameData, startGameSetup);
 
-	gameServer->AddLocalClient(clientSetup->myPlayerName, SpringVersion::GetSync(), Platform::GetPlatformStr());
+	bool quarkActive = false;
+#ifdef __linux__
+	quarkActive = (quark_sdk_is_active() != 0);
+#endif
+	gameServer->AddLocalClient(clientSetup->myPlayerName, SpringVersion::GetSync(), Platform::GetPlatformStr(), quarkActive);
 	good_fpu_control_registers("after CGameServer creation");
 }
 
@@ -530,7 +538,12 @@ void CPreGame::StartServerForDemo(const std::string& demoName)
 	good_fpu_control_registers("before CGameServer creation");
 
 	gameServer = new CGameServer(clientSetup, gameData, demoGameSetup);
-	gameServer->AddLocalClient(clientSetup->myPlayerName, SpringVersion::GetSync(), Platform::GetPlatformStr());
+
+	bool demoQuarkActive = false;
+#ifdef __linux__
+	demoQuarkActive = (quark_sdk_is_active() != 0);
+#endif
+	gameServer->AddLocalClient(clientSetup->myPlayerName, SpringVersion::GetSync(), Platform::GetPlatformStr(), demoQuarkActive);
 
 	good_fpu_control_registers("after CGameServer creation");
 	LOG("[PreGame::%s] started GameServer", __func__);

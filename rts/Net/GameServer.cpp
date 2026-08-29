@@ -359,12 +359,12 @@ void CGameServer::StripGameSetupText(GameData* gameData)
 }
 
 
-void CGameServer::AddLocalClient(const std::string& myName, const std::string& myVersion, const std::string& myPlatform)
+void CGameServer::AddLocalClient(const std::string& myName, const std::string& myVersion, const std::string& myPlatform, bool myQuarkActive)
 {
 	std::lock_guard<spring::recursive_mutex> scoped_lock(gameServerMutex);
 	assert(!HasLocalClient());
 
-	localClientNumber = BindConnection(std::shared_ptr<netcode::CConnection>(new netcode::CLocalConnection()), myName, "", myVersion, myPlatform, true);
+	localClientNumber = BindConnection(std::shared_ptr<netcode::CConnection>(new netcode::CLocalConnection()), myName, "", myVersion, myPlatform, true, myQuarkActive);
 }
 
 void CGameServer::AddAutohostInterface(const std::string& autohostIP, const int autohostPort)
@@ -1893,6 +1893,7 @@ void CGameServer::HandleConnectionAttempts()
 			std::string platform;
 			uint8_t reconnect;
 			uint8_t netloss;
+			uint8_t quarkActive;
 			uint16_t netversion;
 			msg >> netversion;
 			msg >> name;
@@ -1901,11 +1902,12 @@ void CGameServer::HandleConnectionAttempts()
 			msg >> platform;
 			msg >> reconnect;
 			msg >> netloss;
+			msg >> quarkActive;
 
 			if (netversion != NETWORK_VERSION)
 				throw netcode::UnpackPacketException(spring::format("Wrong network version: received %d, required %d", (int)netversion, (int)NETWORK_VERSION));
 
-			BindConnection(udpListener->AcceptConnection(), name, passwd, version, platform, false, reconnect, netloss);
+			BindConnection(udpListener->AcceptConnection(), name, passwd, version, platform, false, quarkActive != 0, reconnect, netloss);
 		} catch (const netcode::UnpackPacketException& ex) {
 			const asio::ip::udp::endpoint endp = prev->GetEndpoint();
 			const asio::ip::address addr = endp.address();
@@ -2931,6 +2933,7 @@ unsigned CGameServer::BindConnection(
 	const std::string& clientVersion,
 	const std::string& clientPlatform,
 	bool isLocal,
+	bool clientQuarkActive,
 	bool reconnect,
 	int netloss
 ) {
@@ -3022,6 +3025,15 @@ unsigned CGameServer::BindConnection(
 		if (errMsg.empty() && !isLocal)
 			if (!CheckPlayerPassword(newPlayerNumber, clientPassword))
 				errMsg = "Incorrect password";
+
+		// Quark Anticheat: this match opted in (GAME\ModOptions\RequireQuarkAnticheat) --
+		// applies to every connecting player, including the local host, so a host
+		// without confirmed Quark protection can't start a match it marked as
+		// protected either. Only applies to real networked sessions: a purely
+		// local match (onlyLocal, e.g. singleplayer/AI-only skirmish) never lets
+		// anyone else connect anyway, so there's nothing to protect against.
+		if (errMsg.empty() && !myGameSetup->onlyLocal && myGameSetup->requireQuarkAnticheat && !clientQuarkActive)
+			errMsg = "Quark Anticheat required for this match but not active on client";
 
 		// do not respond before we are sure we want to, and never respond to
 		// reconnection attempts since it could interfere with the protocol and

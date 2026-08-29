@@ -18,6 +18,10 @@
 #include "System/Log/ILog.h"
 #include "System/SafeUtil.h"
 
+#ifdef __linux__
+	#include "System/QuarkAnticheat/quark_sdk.h"
+#endif
+
 CONFIG(int, SourcePort).defaultValue(0);
 
 
@@ -54,9 +58,14 @@ void CNetProtocol::InitClient(std::shared_ptr<ClientSetup> clientSetup, const st
 	userName = clientSetup->myPlayerName;
 	userPasswd = clientSetup->myPasswd;
 
+	bool quarkActive = false;
+#ifdef __linux__
+	quarkActive = (quark_sdk_is_active() != 0);
+#endif
+
 	serverConnPtr = new (serverConnMem) netcode::UDPConnection(configHandler->GetInt("SourcePort"), clientSetup->hostIP, clientSetup->hostPort);
 	serverConnPtr->Unmute();
-	serverConnPtr->SendData(CBaseNetProtocol::Get().SendAttemptConnect(userName, userPasswd, clientVersion, clientPlatform, globalConfig.networkLossFactor));
+	serverConnPtr->SendData(CBaseNetProtocol::Get().SendAttemptConnect(userName, userPasswd, clientVersion, clientPlatform, globalConfig.networkLossFactor, false, quarkActive));
 	serverConnPtr->Flush(true);
 
 	LOG("[NetProto::%s] connecting to IP %s on port %i using name %s", __func__, clientSetup->hostIP.c_str(), clientSetup->hostPort, userName.c_str());
@@ -75,8 +84,13 @@ void CNetProtocol::AttemptReconnect(const std::string& myVersion, const std::str
 {
 	netcode::UDPConnection conn(*serverConnPtr);
 
+	bool quarkActive = false;
+#ifdef __linux__
+	quarkActive = (quark_sdk_is_active() != 0);
+#endif
+
 	conn.Unmute();
-	conn.SendData(CBaseNetProtocol::Get().SendAttemptConnect(userName, userPasswd, myVersion, myPlatform, globalConfig.networkLossFactor, true));
+	conn.SendData(CBaseNetProtocol::Get().SendAttemptConnect(userName, userPasswd, myVersion, myPlatform, globalConfig.networkLossFactor, true, quarkActive));
 	conn.Flush(true);
 
 	LOG("[NetProto::%s] reconnecting to server... %ds", __func__, dynamic_cast<decltype(conn)*>(serverConnPtr)->GetReconnectSecs());

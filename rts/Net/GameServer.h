@@ -77,7 +77,7 @@ public:
 
 	static void Reload(const std::shared_ptr<const CGameSetup> newGameSetup);
 
-	void AddLocalClient(const std::string& myName, const std::string& myVersion, const std::string& myPlatform);
+	void AddLocalClient(const std::string& myName, const std::string& myVersion, const std::string& myPlatform, bool myQuarkActive = false);
 	void AddAutohostInterface(const std::string& autohostIP, const int autohostPort);
 
 	void Initialize();
@@ -151,6 +151,7 @@ private:
 		const std::string& clientVersion,
 		const std::string& clientPlatform,
 		bool isLocal,
+		bool clientQuarkActive = false,
 		bool reconnect = false,
 		int netloss = 0
 	);

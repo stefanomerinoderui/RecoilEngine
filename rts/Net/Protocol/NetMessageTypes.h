@@ -80,7 +80,7 @@ enum NETMSG {
 	NETMSG_TEAMSTAT         = 60, // uint8_t teamNum, struct TeamStatistics statistics      # used by LadderBot #
 	NETMSG_CLIENTDATA       = 61, // uint16_t messageSize, std::string setupText
 
-	NETMSG_ATTEMPTCONNECT   = 65, // uint16_t msgsize, uint16_t netversion, string playername, string passwd, string VERSION_STRING_DETAILED
+	NETMSG_ATTEMPTCONNECT   = 65, // uint16_t msgsize, uint16_t netversion, string playername, string passwd, string VERSION_STRING_DETAILED, string platform, uint8_t reconnect, uint8_t netloss, uint8_t quarkAnticheatActive
 	NETMSG_REJECT_CONNECT   = 66, // string reason
 
 	NETMSG_AI_CREATED       = 70, // /* uint8_t messageSize */, uint8_t playerNum, uint8_t whichSkirmishAI, uint8_t team, std::string name (ends with \0)

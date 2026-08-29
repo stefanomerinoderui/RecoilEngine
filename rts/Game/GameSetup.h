@@ -35,6 +35,7 @@ public:
 		useLuaGaia = gs.useLuaGaia;
 		luaDevMode = gs.luaDevMode;
 		noHelperAIs = gs.noHelperAIs;
+		requireQuarkAnticheat = gs.requireQuarkAnticheat;
 
 		ghostedBuildings = gs.ghostedBuildings;
 		disableMapDamage = gs.disableMapDamage;
@@ -184,6 +185,10 @@ public:
 	bool useLuaGaia;
 	bool luaDevMode;
 	bool noHelperAIs;
+
+	/** Quark Anticheat: if true, joining/hosting this match requires confirmed
+	 * Ring-0 process protection (see rts/System/QuarkAnticheat/quark_sdk.h). */
+	bool requireQuarkAnticheat;
 
 	bool ghostedBuildings;
 	bool disableMapDamage;

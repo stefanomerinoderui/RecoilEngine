@@ -240,12 +240,14 @@ PacketType CBaseNetProtocol::SendAttemptConnect(
 	const std::string& version,
 	const std::string& platform,
 	int32_t netloss,
-	bool reconnect
+	bool reconnect,
+	bool quarkActive
 ) {
 	const uint32_t payloadSize =
 		sizeof(NETWORK_VERSION) +
 		sizeof(static_cast<uint8_t>(netloss)) +
 		sizeof(static_cast<uint8_t>(reconnect)) +
+		sizeof(static_cast<uint8_t>(quarkActive)) +
 		(name.size() + 1) +
 		(passwd.size() + 1) +
 		(version.size() + 1) +
@@ -262,6 +264,7 @@ PacketType CBaseNetProtocol::SendAttemptConnect(
 	*packet << platform;
 	*packet << uint8_t(reconnect);
 	*packet << uint8_t(netloss);
+	*packet << uint8_t(quarkActive);
 
 	return PacketType(packet);
 }
